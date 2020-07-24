@@ -13,11 +13,11 @@ df = pd.read_csv("youtubedata.txt",sep='\t')
 print(df.shape)
 l=[]
 for i in range(0,4100):
-    l0=[df.ix[i,j] for j in range(0,29)]
+    l0=[df.ix[i,j] for j in range(10,29)]
     l.append(list(l0))
 df=df.ix[0:4099,0:9]
 df['REL_VID_ID']=l
-print(df.shape)
+print(df['REL_VID_ID'])
 
 
 #renaming columns
@@ -66,7 +66,7 @@ x2 = x1.head(10)
 print("The top 10 videos with maximum video length are stored in 'top10lens.csv'\n\n\n")
 x2.to_csv('top10lens.csv')
 
-
+'''
 #Question 4)Most controversial video categories based on no. of comments by no. of views
 di={}
 for i in df['CATEGORY'].unique():
@@ -78,7 +78,7 @@ for i in df['CATEGORY'].unique():
         l33=np.ma.array(l31,mask=(l31==0))
         l34=np.ma.array(l32,mask=(l32==0))
         l3=l33/l34
-        l3*=1000
+        l3=[i*1000 for i in l3]
         for n in l3:
             avg_com_score+=n
         try:
@@ -86,13 +86,13 @@ for i in df['CATEGORY'].unique():
         except ZeroDivisionError:
             avg_com_score=0
         di.update({i:avg_com_score})
-sorted_d=sorted(d.items(),key=lambda kx:kx[1],reverse=True)
+sorted_d=sorted(di.items(),key=lambda kx:kx[1],reverse=True)
 w2=pd.DataFrame(sorted_d)
 w2.columns=['Category', 'Con_Score']
 print("Categories arranged in the order of  controversiality are stored in 'topconcats.csv'")
 w2.to_csv('topconcats.csv')
 print("\n\n\n")
-   
+'''   
         
 #Question 5)calculate popularity of each video and rank them from best to worst
 l41=np.ma.array(df['NO_OF_VIEWS'],mask=(df['NO_OF_VIEWS']==0))
@@ -137,3 +137,40 @@ plt.title("Relation between Length of video and no. of views")
 plt.xlabel("Length in mins")
 plt.ylabel("no. of Views")
 plt.show()
+print('\n\n')
+
+
+#categories with highest popularity
+di={}
+for i in df['CATEGORY'].unique():
+    avg_pop_score=0
+    if i not in di.keys():
+        w1=df[df['CATEGORY']==i]
+        l3=np.array(w1['POPULARITY'])
+        for n in l3:
+            avg_pop_score+=n
+        try:
+            avg_com_score/=len(l3)
+        except ZeroDivisionError:
+            avg_pop_score=0
+        di.update({i:avg_pop_score})
+sorted_d=sorted(di.items(),key=lambda kx:kx[1],reverse=True)
+w2=pd.DataFrame(sorted_d)
+w2.columns=['Category', 'Pop_Score']
+print("Categories arranged in the order of  popularity are stored in 'toppopcats.csv'")
+w2.to_csv('toppopcats.csv')
+print("\n\n\n")
+
+
+#Identify top 10 videos with maximum no. of views
+x1 = df.sort_values(by='NO_OF_VIEWS', ascending=0)
+x2 = x1.head(10)
+print("The top 10 videos with maximum no. of views are stored in 'top10views.csv'\n\n\n")
+x2.to_csv('top10views.csv')
+
+
+#Identify top 10 videos with maximum no. of comments
+x1 = df.sort_values(by='NO_OF_COMS', ascending=0)
+x2 = x1.head(10)
+print("The top 10 videos with maximum no. of comments are stored in 'top10coms.csv'\n\n\n")
+x2.to_csv('top10coms.csv')
